@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laxmi Crockery | Smart Billing</title>
+<style>
+:root{--navy:#173b5e;--blue:#24618e;--pale:#e8f1f8;--ink:#1f2937;--muted:#64748b;--line:#dbe3ea;--bg:#f4f7fa;--green:#16834b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px Arial,sans-serif;color:var(--ink)}
+header{background:#fff;border-bottom:1px solid var(--line);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:21px;font-weight:800;color:var(--navy)}.sub{color:var(--muted);font-size:12px;margin-top:4px}
+.wrap{max-width:1200px;margin:24px auto;padding:0 18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+button,.btn{border:0;border-radius:8px;padding:11px 15px;background:var(--navy);color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:#e7eef4;color:var(--navy)}button.green{background:var(--green)}button.danger{background:#b42318}
+button:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 2px 8px #173b5e0a}
+h2{font-size:18px;margin:0 0 16px;color:var(--navy)}h3{font-size:14px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{padding:16px;border-radius:10px;background:#f5f8fb;border:1px solid var(--line)}.stat strong{display:block;font-size:23px;color:var(--navy);margin-top:8px}
+label{display:block;font-size:12px;color:#475569;font-weight:700;margin:0 0 6px}
+input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:7px;font:14px Arial;background:white;color:var(--ink)}
+.field{margin-bottom:13px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+table{border-collapse:collapse;width:100%;margin:10px 0}th,td{border:1px solid var(--line);padding:9px;text-align:left;font-size:13px}th{background:var(--pale);color:#173b5e}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.total{text-align:right;font-size:17px;font-weight:800;color:var(--navy);margin-top:12px}
+.hidden{display:none!important}.hint{font-size:12px;color:var(--muted);line-height:1.5}.pill{display:inline-block;background:#e8f5ed;color:#17663d;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:700}
+.invoice{max-width:850px;margin:20px auto;background:#fff;border:1px solid #333;padding:28px;color:#111}
+.invoice h1{text-align:center;color:#24577d;font-size:24px;margin:0}.invoice .address{text-align:center;margin:8px 0 18px;font-size:12px}.invoice h2{text-align:center;color:#111;font-size:20px}
+.invoice .meta td:first-child{background:#e0edf6;font-weight:bold;width:22%}.invoice .grand td{background:#e0edf6;font-weight:bold}.invoice .foot{text-align:center;color:#24577d;font-weight:bold;margin-top:40px}
+.list-actions{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}header{padding:15px}.panel{padding:14px}th,td{padding:6px;font-size:12px}}
+@media print{body{background:white}.no-print{display:none!important}.invoice{border:0;margin:0;padding:15mm;max-width:none}.invoice table{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">Laxmi Crockery &amp; Housewere</div><div class="sub">130, Shree Ram Vihar Manyawas Road, Mansarover, Jaipur · 8306157269</div></div><span class="pill">SMART BILLING</span></header>
+<main class="wrap">
+<div class="tabs no-print">
+<button onclick="show('dashboard')">Dashboard</button><button class="secondary" onclick="show('sale')">＋ New Sale</button><button class="secondary" onclick="show('history')">Sales History</button><button class="secondary" onclick="show('settings')">Settings</button>
+</div>
+<section id="dashboard">
+<div class="grid">
+<div class="stat">Today's sales<strong id="todaySales">₹0</strong></div><div class="stat">Today's transactions<strong id="todayCount">0</strong></div><div class="stat">Total invoices<strong id="invoiceCount">0</strong></div><div class="stat">All-time sales<strong id="allSales">₹0</strong></div>
+</div>
+<div class="panel" style="margin-top:18px"><h2>Quick actions</h2><p class="hint">Create a full invoice or record a quick sale and prepare a WhatsApp thank-you message.</p><div class="row-actions"><button onclick="show('sale')">Create New Sale</button><button class="secondary" onclick="show('history')">View Sales History</button></div></div>
+</section>
+<section id="sale" class="hidden no-print">
+<div class="panel">
+<h2>New Sale</h2>
+<div class="formgrid">
+<div class="field"><label>Customer name (optional for quick sale)</label><input id="customer" placeholder="Customer name"></div>
+<div class="field"><label>Customer WhatsApp mobile number</label><input id="mobile" inputmode="tel" placeholder="e.g. 919876543210"></div>
+<div class="field"><label>Sale date</label><input id="saleDate" type="date"></div>
+<div class="field"><label>Sale type</label><select id="saleType" onchange="toggleBill()"><option value="invoice">Customer requires invoice (PDF)</option><option value="quick">Quick sale (WhatsApp message only)</option></select></div>
+</div>
+<h3>Product details</h3>
+<table id="productTable"><thead><tr><th style="width:42%">Product / Description</th><th>Qty.</th><th>Unit price (₹)</th><th>Amount (₹)</th><th></th></tr></thead><tbody></tbody></table>
+<button class="secondary" onclick="addRow()">＋ Add product</button>
+<div class="total">Total payable: <span id="liveTotal">₹0.00</span></div>
+<p class="hint">Enter the final selling price per unit. The total is treated as tax-inclusive; no extra GST is added. For a GST tax invoice, configure and verify the required GST details with your accountant.</p>
+<div id="invoiceFields">
+<h3 style="margin-top:20px">Payment details</h3>
+<div class="formgrid">
+<div class="field"><label>Payment mode</label><select id="paymentMode"><option>Cash</option><option>UPI / PhonePe / Paytm</option><option>Bank Transfer</option><option>Other</option></select></div>
+<div class="field"><label>Payment status</label><select id="paymentStatus"><option>Paid</option><option>Due</option><option>Partial</option></select></div>
+</div>
+</div>
+<div class="row-actions"><button onclick="saveSale()">Save sale &amp; continue</button><button class="secondary" onclick="resetSale()">Clear form</button></div>
+<div id="afterSave" class="hidden panel" style="margin-top:18px">
+<h3>Sale saved</h3><div class="row-actions"><button id="pdfBtn" onclick="printInvoice()">Preview / Save PDF</button><button class="green" onclick="shareWhatsApp()">Open WhatsApp message</button></div>
+<p class="hint">WhatsApp opens with a pre-filled message. Review it and press Send yourself.</p>
+</div>
+</div>
+</section>
+<section id="history" class="hidden no-print"><div class="panel"><h2>Sales History</h2><input id="searchHistory" placeholder="Search invoice, customer or mobile" oninput="renderHistory()"><div id="historyTable"></div></div></section>
+<section id="settings" class="hidden no-print"><div class="panel"><h2>Shop Settings</h2><p class="hint">These details appear on new invoices. Bank details are intentionally left for you to enter.</p>
+<div class="formgrid">
+<div class="field"><label>Shop name</label><input id="sName"></div><div class="field"><label>Shop phone</label><input id="sPhone"></div>
+<div class="field"><label>Shop address</label><input id="sAddress"></div><div class="field"><label>GSTIN (optional)</label><input id="sGstin"></div>
+<div class="field"><label>Bank / UPI payment details (optional)</label><textarea id="sPayment" rows="3" placeholder="Enter only details you want printed"></textarea></div>
+</div><div class="row-actions"><button onclick="saveSettings()">Save settings</button></div></div></section>
+<section id="printArea" class="hidden"><div id="invoicePreview" class="invoice"></div></section>
+</main>
+<script>
+const defaults={name:"Laxmi Crockery & Housewere",phone:"8306157269",address:"130, Shree Ram Vihar Manyawas Road, Mansarover, Jaipur",gstin:"",payment:""};
+let settings=JSON.parse(localStorage.getItem("lc_settings")||"null")||defaults;
+let sales=JSON.parse(localStorage.getItem("lc_sales")||"[]"), currentSale=null;
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+function show(id){["dashboard","sale","history","settings","printArea"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id));if(id==="history")renderHistory();if(id==="dashboard")stats();if(id==="settings")loadSettings();}
+function addRow(name="",qty=1,price=""){let tr=document.createElement("tr");tr.innerHTML=`<td><input placeholder="Product name" value="${esc(name)}" class="pname"></td><td><input type="number" min="1" value="${qty}" class="qty"></td><td><input type="number" min="0" step=".01" value="${price}" class="price"></td><td class="amount">₹0.00</td><td><button class="danger" onclick="this.closest('tr').remove();calc()">×</button></td>`;tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",calc));document.querySelector("#productTable tbody").appendChild(tr);calc();}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function getItems(){return [...document.querySelectorAll("#productTable tbody tr")].map(tr=>({name:tr.querySelector(".pname").value.trim(),qty:Number(tr.querySelector(".qty").value),price:Number(tr.querySelector(".price").value),amount:Number(tr.querySelector(".qty").value)*Number(tr.querySelector(".price").value)})).filter(x=>x.name&&x.qty>0&&x.price>=0);}
+function calc(){let sum=0;document.querySelectorAll("#productTable tbody tr").forEach(tr=>{let q=Number(tr.querySelector(".qty").value)||0,p=Number(tr.querySelector(".price").value)||0,a=q*p;sum+=a;tr.querySelector(".amount").textContent=money(a)});document.getElementById("liveTotal").textContent=money(sum);return sum;}
+function toggleBill(){document.getElementById("invoiceFields").classList.toggle("hidden",document.getElementById("saleType").value==="quick");}
+function nextNo(){let y=new Date().getFullYear();let n=sales.filter(s=>s.invoiceNo&&s.invoiceNo.startsWith("INV-"+y)).length+1;return "INV-"+y+"-"+String(n).padStart(3,"0");}
+function saveSale(){let items=getItems(),total=calc(),mobile=document.getElementById("mobile").value.trim();if(!items.length){alert("Add at least one product with name, quantity and price.");return}if(!mobile){alert("Enter customer mobile number for WhatsApp sharing.");return}let type=document.getElementById("saleType").value;currentSale={id:Date.now(),invoiceNo:type==="invoice"?nextNo():"QUICK-"+Date.now(),date:document.getElementById("saleDate").value||new Date().toISOString().slice(0,10),customer:document.getElementById("customer").value.trim()||"Customer",mobile,items,total,type,paymentMode:document.getElementById("paymentMode").value,paymentStatus:document.getElementById("paymentStatus").value};sales.unshift(currentSale);localStorage.setItem("lc_sales",JSON.stringify(sales));document.getElementById("afterSave").classList.remove("hidden");document.getElementById("pdfBtn").classList.toggle("hidden",type==="quick");stats();alert("Sale saved in this browser.");}
+function resetSale(){document.getElementById("customer").value="";document.getElementById("mobile").value="";document.querySelector("#productTable tbody").innerHTML="";addRow();document.getElementById("afterSave").classList.add("hidden");currentSale=null;calc();}
+function invoiceHTML(s){let rows=s.items.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${money(x.price)}</td><td>${money(x.amount)}</td></tr>`).join("");return `<h1>${esc(settings.name)}</h1><div class="address">${esc(settings.address)} | ${esc(settings.phone)}<br>${settings.gstin?"GSTIN: "+esc(settings.gstin):""}</div><h2>INVOICE</h2><table class="meta"><tr><td>Invoice No.</td><td>${esc(s.invoiceNo)}</td><td>Invoice Date</td><td>${esc(s.date)}</td></tr><tr><td>Customer Name</td><td>${esc(s.customer)}</td><td>Mobile / Email</td><td>${esc(s.mobile)}</td></tr></table><h3>Product / Service Details</h3><table><tr><th>S. No.</th><th>Product / Description</th><th>Qty.</th><th>Unit Price (₹)</th><th>Amount (₹)</th></tr>${rows}</table><table><tr><td>Subtotal (inclusive of applicable taxes)</td><td>${money(s.total)}</td></tr><tr><td>Additional tax</td><td>₹0.00 (included above)</td></tr><tr class="grand"><td>GRAND TOTAL PAYABLE</td><td>${money(s.total)}</td></tr></table><p><b>Tax Note:</b> The total payable is the final amount and is inclusive of applicable taxes. No additional tax is added.</p><h3>Payment Details</h3><table><tr><td>Payment Mode</td><td>${esc(s.paymentMode)}</td></tr><tr><td>Payment Status</td><td>${esc(s.paymentStatus)}</td></tr>${settings.payment?`<tr><td>Payment Information</td><td>${esc(settings.payment).replace(/\n/g,"<br>")}</td></tr>`:""}</table><h3>Terms &amp; Conditions</h3><p>1. Please verify the product details and amount at the time of delivery.<br>2. The grand total is inclusive of applicable taxes.<br>3. This bill is issued for the products described above.</p><div class="foot">Thank you for your business!</div>`}
+function printInvoice(){if(!currentSale||currentSale.type!=="invoice")return;document.getElementById("invoicePreview").innerHTML=invoiceHTML(currentSale);document.getElementById("printArea").classList.remove("hidden");window.print();document.getElementById("printArea").classList.add("hidden");}
+function shareWhatsApp(s=currentSale){if(!s)return;let lines=s.items.map(x=>`• ${x.name} - ${x.qty} x ${money(x.price)} = ${money(x.amount)}`).join("\n");let msg=`Thank you for shopping with ${settings.name}!\n\nPurchase details:\n${lines}\n\nTotal Amount: ${money(s.total)}\n\nThank you for your business! Visit again.`;let phone=s.mobile.replace(/\D/g,"");if(phone.length===10)phone="91"+phone;window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg),"_blank");}
+function renderHistory(){let q=(document.getElementById("searchHistory").value||"").toLowerCase(),arr=sales.filter(s=>(s.invoiceNo+s.customer+s.mobile).toLowerCase().includes(q));document.getElementById("historyTable").innerHTML=arr.length?`<table><tr><th>Invoice / Sale</th><th>Date</th><th>Customer</th><th>Total</th><th>Type</th><th>Actions</th></tr>${arr.map(s=>`<tr><td>${esc(s.invoiceNo)}</td><td>${esc(s.date)}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td>${s.type==="invoice"?"Invoice":"Quick sale"}</td><td><div class="list-actions"><button class="secondary" onclick="repeatWhatsApp(${s.id})">WhatsApp</button>${s.type==="invoice"?`<button onclick="oldPdf(${s.id})">PDF</button>`:""}</div></td></tr>`).join("")}</table>`:"<p class='hint'>No sales found.</p>"}
+function repeatWhatsApp(id){let s=sales.find(x=>x.id===id);shareWhatsApp(s)}
+function oldPdf(id){let s=sales.find(x=>x.id===id);currentSale=s;printInvoice()}
+function stats(){let today=new Date().toISOString().slice(0,10),ts=sales.filter(s=>s.date===today);document.getElementById("todaySales").textContent=money(ts.reduce((a,s)=>a+s.total,0));document.getElementById("todayCount").textContent=ts.length;document.getElementById("invoiceCount").textContent=sales.filter(s=>s.type==="invoice").length;document.getElementById("allSales").textContent=money(sales.reduce((a,s)=>a+s.total,0))}
+function loadSettings(){for(let k of ["name","phone","address","gstin","payment"])document.getElementById("s"+k[0].toUpperCase()+k.slice(1)).value=settings[k]||""}
+function saveSettings(){settings={name:sName.value.trim(),phone:sPhone.value.trim(),address:sAddress.value.trim(),gstin:sGstin.value.trim(),payment:sPayment.value.trim()};localStorage.setItem("lc_settings",JSON.stringify(settings));alert("Settings saved.");document.querySelector("header .brand").textContent=settings.name}
+document.getElementById("saleDate").value=new Date().toISOString().slice(0,10);addRow();stats();document.querySelector("header .brand").textContent=settings.name;
+</script>
+</body></html>
